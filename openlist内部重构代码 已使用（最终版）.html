@@ -195,7 +195,7 @@
         };
 
         function getGithubRepoPath() {
-            const fromWindow = (window.__OPENLIST_GITHUB_REPO__ || GISCUS_CONFIG.repo || '').trim();
+            const fromWindow = (window.__OPENLIST_GITHUB_REPO__ || GISCUS_CONFIG.repo || 'xingxinag/open-list-session').trim();
             if (fromWindow) {
                 try { localStorage.setItem('openlist_github_repo', fromWindow); } catch (_) {}
                 return fromWindow;

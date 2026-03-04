@@ -1,0 +1,887 @@
+<!-- ==================== OpenList 内部文件 (重构优化版) ==================== -->
+
+<!-- 渐变背景 (可选) -->
+<!-- <canvas id="canvas-basic"></canvas> -->
+<script>
+    const canvas = document.getElementById('canvas-basic');
+    if (canvas) {
+        new Granim({
+            element: '#canvas-basic',
+            direction: 'left-right',
+            isPausedWhenNotInView: true,
+            states: {
+                "default-state": {
+                    gradients: [
+                        ['#a18cd1', '#fbc2eb'], ['#fff1eb', '#ace0f9'],
+                        ['#d4fc79', '#96e6a1'], ['#a1c4fd', '#c2e9fb'],
+                        ['#a8edea', '#fed6e3'], ['#9890e3', '#b1f4cf']
+                    ]
+                }
+            }
+        });
+    }
+</script>
+
+<!-- 延迟加载容器 -->
+<div id="customize" style="display: none;">
+
+    <!-- 音乐播放器 -->
+    <meting-js server="tencent" type="playlist" id="3415481906"
+        fixed="true" mini="true" order="random" loop="all"
+        preload="metadata" list-folded="true" list-max-height="200px"
+        lrc-type="1" storage-name="openlist_aplayer_settings"
+        autoplay="false" mutex="true" volume="0.6">
+    </meting-js>
+
+    <!-- 评论侧边标签 -->
+    <div class="side-tab comment-tab" id="comment-tab">
+        <i class="fas fa-comments"></i>
+        <span>评论</span>
+    </div>
+
+    <!-- 评论区容器 -->
+    <div id="comment-container" class="popup-container">
+        <div class="popup-area comment-area">
+            <div class="close-hint">点击空白区域关闭评论区</div>
+            <div class="popup-header">
+                <h2>💬 评论区</h2>
+                <button class="close-button">×</button>
+            </div>
+            <div class="popup-content">
+                <div class="magic-hint">如需使用《评论》或《友链》请开启魔法后访问该网页。</div>
+                <div id="comments" style="width:100%;min-height:500px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 友链侧边标签 -->
+    <div class="side-tab friend-links-tab" id="friend-links-tab">
+        <i class="fas fa-user-friends"></i>
+        <span>友链</span>
+    </div>
+
+    <!-- 友链容器 -->
+    <div id="friend-container" class="popup-container">
+        <div class="popup-area friend-links-display">
+            <div class="close-hint">点击空白区域关闭友链</div>
+            <div class="popup-header">
+                <h2>🤝 友情链接</h2>
+                <button class="close-button">×</button>
+            </div>
+            <div class="popup-content form-collapsed">
+                <div class="magic-hint">如需使用《评论》或《友链》请开启魔法后访问该网页。</div>
+                <div id="friend-links-list"></div>
+
+                <button id="toggleFriendLinkForm" class="toggle-form-button">点击填写友链申请表</button>
+
+                <div id="friendLinkFormContainer" class="friend-link-form-container">
+                    <div class="form-collapsible-content">
+                        <h3>📝 申请友链</h3>
+                        <form id="friendLinkForm">
+                            <div class="form-group">
+                                <label for="siteName">网站名称：</label>
+                                <input type="text" id="siteName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="siteUrl">网站链接：</label>
+                                <input type="url" id="siteUrl" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="siteDesc">网站描述：</label>
+                                <input type="text" id="siteDesc" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="siteIcon">网站图标：</label>
+                                <input type="url" id="siteIcon">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmCode">
+                                    备注码（可选）：
+                                    <span style="color: gray; font-size: 0.9em;">用于你自己标记申请记录</span>
+                                </label>
+                                <input type="text" id="confirmCode" maxlength="32" placeholder="可选填写">
+                            </div>
+                            <button type="submit" class="submit-button">提交申请</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部区域 -->
+    <center class="dibu">
+        <div style="line-height: 16px;font-size: 8pt;font-weight: bold;margin-bottom: 5px;">
+            <span>"<span style="color: rgb(13, 109, 252); font-weight: bold;" id="hitokoto">
+                <a href="#" id="hitokoto_text">"人生最大的遗憾,就是在最无能为力的时候遇到一个想要保护一生的人."</a>
+            </span>"</span>
+            <span style="margin-left: 2rem;font-size: 7pt;"><small>—— Anwen's Cloud</small></span>
+        </div>
+
+        <div style="font-size: 11px; font-weight: bold; line-height: 14px;">
+            <span class="nav-item">
+                <a class="nav-link" href="javascript:void(0)" data-action="open-friend-links">
+                    <i class="fas fa-handshake" style="color:#409EFF"></i> 友链 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="/cdn-cgi/l/email-protection#5f27272727271f393027323e3633713c3032" target="_blank">
+                    <i class="fa-duotone fa-envelope-open" style="color:#409EFF"></i> 邮箱 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="xxxxxx" target="_blank">
+                    <i class="fas fa-edit" style="color:#409EFF"></i> 博客 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="xxxxxxxx" target="_blank">
+                    <i class="fas fa-comment-lines" style="color:#409EFF"></i> 留言 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="xxxxxxx" target="_blank">
+                    <i class="fa fa-cloud-download" style="color:#409EFF"></i> 云盘 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="/@manage" target="_blank">
+                    <i class="fa-solid fa-folder-gear" style="color:#409EFF"></i> 管理 |
+                </a>
+            </span>
+            <span class="nav-item">
+                <a class="nav-link" href="https://doc.oplist.org/guide" target="_blank">
+                    <i class="fa-solid fa-copyright" style="color:#409EFF"></i> OpenList
+                </a>
+            </span>
+            <br />
+            <div style="font-size: 9px; margin: 3px 0;">
+                <span>
+                    本"<span style="color: rgb(13, 109, 252); font-weight: bold;"><a href="#">目录</a></span>"访问量 <span
+                        id="busuanzi_value_page_pv" style="color: rgb(13, 109, 252); font-weight: bold;"></span> 次 本站总访问量
+                    <span id="busuanzi_value_site_pv" style="color: rgb(13, 109, 252); font-weight: bold;"></span> 次 本站总访客数
+                    <span id="busuanzi_value_site_uv" style="color: rgb(13, 109, 252); font-weight: bold;"></span> 人
+                </span>
+                <span class="nav-item" style="margin-left: 10px;">
+                    <a class="nav-link" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" style="font-size: 9px;">
+                        <i class="fa-solid fa-shield-check" style="color:#409EFF"></i>
+                        冀 ICP无备号
+                    </a>
+                </span>
+            </div>
+        </div>
+    </center>
+    <br />
+    <br />
+
+    <!-- 一言API -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
+
+    <!-- ==================== 功能脚本 (重构优化) ==================== -->
+    <script>
+        // --- 全局常量和配置 ---
+        const GISCUS_CONFIG = {
+            repo: window.__OPENLIST_GISCUS_REPO__ || '',
+            repoId: window.__OPENLIST_GISCUS_REPO_ID__ || '',
+            category: window.__OPENLIST_GISCUS_CATEGORY__ || 'General',
+            categoryId: window.__OPENLIST_GISCUS_CATEGORY_ID__ || '',
+            mapping: 'pathname',
+            strict: '0',
+            reactionsEnabled: '1',
+            emitMetadata: '0',
+            inputPosition: 'top',
+            theme: 'preferred_color_scheme',
+            lang: 'zh-CN'
+        };
+
+        function getGithubRepoPath() {
+            const fromWindow = (window.__OPENLIST_GITHUB_REPO__ || GISCUS_CONFIG.repo || '').trim();
+            if (fromWindow) {
+                try { localStorage.setItem('openlist_github_repo', fromWindow); } catch (_) {}
+                return fromWindow;
+            }
+
+            try {
+                return (localStorage.getItem('openlist_github_repo') || '').trim();
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function getFriendLinksJsonUrls() {
+            const repoPath = getGithubRepoPath();
+            return [
+                '/friends.json',
+                window.__OPENLIST_FRIENDS_JSON_URL__ || '',
+                repoPath ? `https://raw.githubusercontent.com/${repoPath}/main/friends.json` : '',
+                repoPath ? `https://cdn.jsdelivr.net/gh/${repoPath}@main/friends.json` : ''
+            ].filter(Boolean);
+        }
+
+        function getFriendLinkSubmitUrl() {
+            const repoPath = getGithubRepoPath();
+            return window.__OPENLIST_FRIENDS_SUBMIT_URL__ || (repoPath ? `https://github.com/${repoPath}/issues/new` : '');
+        }
+
+        window.configureGithubRepo = function() {
+            const current = getGithubRepoPath();
+            const input = window.prompt('请输入 GitHub 仓库路径（例如：yourname/openlist-social）', current || '');
+            if (!input) return;
+            const repoPath = input.trim();
+            if (!/^[^/]+\/[A-Za-z0-9._-]+$/.test(repoPath)) {
+                alert('仓库格式不正确，请使用：用户名/仓库名');
+                return;
+            }
+            try { localStorage.setItem('openlist_github_repo', repoPath); } catch (_) {}
+            alert('GitHub 仓库已保存，页面将刷新生效。');
+            window.location.reload();
+        };
+
+        const SUBMIT_LIMITS = { delay: 60000, maxPerDay: 3 };
+        let giscusLoaderPromise = null;
+
+        // --- 辅助函数 ---
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func.apply(this, args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+
+        const throttle = (func, limit) => {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        };
+
+        async function retryAsync(task, retries = 2, delay = 500) {
+            let lastError;
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    return await task();
+                } catch (error) {
+                    lastError = error;
+                    if (attempt < retries) {
+                        await new Promise(resolve => setTimeout(resolve, delay * (attempt + 1)));
+                    }
+                }
+            }
+            throw lastError;
+        }
+
+        function ensureGiscusReady() {
+            if (giscusLoaderPromise) return giscusLoaderPromise;
+
+            const source = 'https://giscus.app/client.js';
+            giscusLoaderPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = source;
+                script.async = true;
+                script.crossOrigin = 'anonymous';
+                script.onload = () => resolve(true);
+                script.onerror = () => reject(new Error('Giscus 脚本加载失败'));
+                document.head.appendChild(script);
+            });
+
+            return giscusLoaderPromise;
+        }
+
+        function ensureBusuanziStats() {
+            const ids = ['busuanzi_value_page_pv', 'busuanzi_value_site_pv', 'busuanzi_value_site_uv'];
+            const spans = ids.map(id => document.getElementById(id)).filter(Boolean);
+            if (spans.length === 0) return;
+
+            spans.forEach(el => {
+                if (!el.textContent.trim()) el.textContent = '...';
+            });
+
+            const hasValue = () => spans.some(el => /\d+/.test(el.textContent));
+            const loadBusuanziFallback = (urls) => new Promise((resolve) => {
+                let index = 0;
+                const tryLoad = () => {
+                    if (typeof window.BUSUANZI !== 'undefined') {
+                        resolve(true);
+                        return;
+                    }
+                    if (index >= urls.length) {
+                        resolve(false);
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.src = urls[index++];
+                    script.async = true;
+                    script.onload = () => resolve(true);
+                    script.onerror = tryLoad;
+                    document.head.appendChild(script);
+                };
+                tryLoad();
+            });
+
+            setTimeout(async () => {
+                if (hasValue()) return;
+                await loadBusuanziFallback([
+                    'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js',
+                    'https://busuanzi.icodeq.com/busuanzi.pure.mini.js'
+                ]);
+
+                setTimeout(() => {
+                    if (!hasValue()) spans.forEach(el => { el.textContent = 'N/A'; });
+                }, 3000);
+            }, 3500);
+        }
+
+        // --- 弹窗管理 ---
+        let activePopupContainerId = null; // Track the currently active popup
+
+        function showMobileSwipeHint(area, containerId) {
+            const hintKey = `openlist_swipe_hint_${containerId}`;
+            if (localStorage.getItem(hintKey)) return;
+
+            const hint = document.createElement('div');
+            hint.className = 'mobile-swipe-hint';
+            hint.textContent = containerId === 'comment-container' ? '→ 向右滑动关闭' : '← 向左滑动关闭';
+            area.appendChild(hint);
+
+            setTimeout(() => {
+                if (hint.parentNode) hint.parentNode.removeChild(hint);
+                localStorage.setItem(hintKey, 'shown');
+            }, 3000);
+        }
+
+        function closeOnOutsideClick(event) {
+            if (!activePopupContainerId) return;
+            if (event.target.closest('.side-tab')) return;
+            const container = document.getElementById(activePopupContainerId);
+            if (!container) return;
+            const area = container.querySelector('.popup-area');
+            if (area && !area.contains(event.target)) {
+                if (activePopupContainerId === 'comment-container') window.closeCommentPopup();
+                else if (activePopupContainerId === 'friend-container') window.closeFriendLinksPopup();
+            }
+        }
+
+        function openPopup(containerId) {
+            if (activePopupContainerId && activePopupContainerId !== containerId) {
+                 // Close the previously active popup before opening a new one
+                 if (activePopupContainerId === 'comment-container') window.closeCommentPopup(false); // Pass false to prevent ESC listener removal
+                 else if (activePopupContainerId === 'friend-container') window.closeFriendLinksPopup(false);
+            }
+
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.style.display = 'block';
+            setTimeout(() => container.classList.add('active'), 10);
+
+            const area = container.querySelector('.popup-area');
+            if (!area) return;
+
+            if (window.innerWidth <= 768) {
+                area.classList.add('mobile', 'mobile-active');
+                area.classList.remove('pc-left', 'pc-right');
+                showMobileSwipeHint(area, containerId);
+            } else {
+                area.classList.remove('mobile', 'mobile-active');
+                const contentRect = document.querySelector('.obj-box')?.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                const smartPositioning = contentRect && contentRect.left > 420 && (viewportWidth - contentRect.right) > 420;
+
+                if (smartPositioning) {
+                    area.classList.add(containerId === 'comment-container' ? 'pc-left' : 'pc-right');
+                } else {
+                    area.style.width = 'min(560px, 85vw)';
+                    area.style.height = 'min(780px, 85vh)';
+                }
+            }
+
+            // Add outside click listener only if no popup is active or different one
+            if (!activePopupContainerId || activePopupContainerId !== containerId) {
+                document.addEventListener('click', closeOnOutsideClick);
+            }
+            document.addEventListener('keydown', handleEscapeKey);
+            activePopupContainerId = containerId;
+        }
+
+        function closePopup(containerId, isEscKey = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const area = container.querySelector('.popup-area');
+            container.classList.remove('active');
+            if (area) {
+                area.classList.remove('mobile', 'mobile-active', 'pc-left', 'pc-right');
+                if (window.innerWidth > 768) {
+                    area.style.width = ''; area.style.height = '';
+                }
+            }
+
+            setTimeout(() => {
+                container.style.display = 'none';
+                if (activePopupContainerId === containerId) {
+                     activePopupContainerId = null;
+                     // Remove listeners only if no other popup is active
+                     if (!isEscKey) {
+                        document.removeEventListener('click', closeOnOutsideClick);
+                     }
+                }
+                // Clean up escape key listener if no popups are active
+                if (!document.querySelector('.popup-container.active')) {
+                    document.removeEventListener('keydown', handleEscapeKey);
+                }
+            }, 300);
+        }
+
+        function handleEscapeKey(event) {
+            if ((event.key === 'Escape' || event.keyCode === 27) && activePopupContainerId) {
+                if (activePopupContainerId === 'comment-container') window.closeCommentPopup(true);
+                else if (activePopupContainerId === 'friend-container') window.closeFriendLinksPopup(true);
+            }
+        }
+
+        function handlePopupResize() {
+            if (!activePopupContainerId) return;
+            openPopup(activePopupContainerId);
+        }
+
+        // --- Side Tab and Content Management ---
+        let isCommentTabExpanded = false;
+        let isFriendLinksTabExpanded = false;
+
+        window.toggleCommentTab = () => {
+            const tab = document.getElementById('comment-tab');
+            if (window.innerWidth <= 768) {
+                if (!isCommentTabExpanded) {
+                    tab.classList.add('mobile-expanded');
+                    setTimeout(window.openCommentPopup, 150);
+                } else {
+                    window.closeCommentPopup();
+                    tab.classList.remove('mobile-expanded');
+                }
+                isCommentTabExpanded = !isCommentTabExpanded;
+            } else {
+                if (!document.getElementById('comment-container').classList.contains('active')) window.openCommentPopup();
+                else window.closeCommentPopup();
+            }
+        };
+
+        window.toggleFriendLinksTab = () => {
+            const tab = document.getElementById('friend-links-tab');
+            if (window.innerWidth <= 768) {
+                if (!isFriendLinksTabExpanded) {
+                    tab.classList.add('mobile-expanded');
+                    setTimeout(window.openFriendLinksPopup, 150);
+                } else {
+                    window.closeFriendLinksPopup();
+                    tab.classList.remove('mobile-expanded');
+                }
+                isFriendLinksTabExpanded = !isFriendLinksTabExpanded;
+            } else {
+                if (!document.getElementById('friend-container').classList.contains('active')) window.openFriendLinksPopup();
+                else window.closeFriendLinksPopup();
+            }
+        };
+
+        function initSideTabHoverEffects() {
+            if (window.innerWidth > 768) {
+                const commentTab = document.getElementById('comment-tab');
+                const friendLinksTab = document.getElementById('friend-links-tab');
+
+                ['mouseenter', 'mouseleave'].forEach(event => {
+                    commentTab[`${event}`] = (e) => e.currentTarget.classList.toggle('comment-hover', event === 'mouseenter');
+                    friendLinksTab[`${event}`] = (e) => e.currentTarget.classList.toggle('friend-hover', event === 'mouseenter');
+                });
+            }
+        }
+
+        function resetMobileTabStates() {
+            if (window.innerWidth > 768) {
+                ['comment', 'friend-links'].forEach(key => {
+                    const tab = document.getElementById(`${key}-tab`);
+                    if (tab) tab.classList.remove('mobile-expanded');
+                });
+                isCommentTabExpanded = false;
+                isFriendLinksTabExpanded = false;
+            }
+        }
+
+        // --- Popup Content Management ---
+        window.openCommentPopup = () => {
+            openPopup('comment-container');
+            if (typeof window.loadCommentSystem === 'function') window.loadCommentSystem();
+            else {
+                const commentsDiv = document.getElementById('comments');
+                if (commentsDiv) commentsDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f00;">评论系统正在加载中...</div>';
+            }
+        };
+
+        window.closeCommentPopup = (isEscKey = false) => {
+            closePopup('comment-container', isEscKey);
+            if (window.innerWidth <= 768) {
+                const tab = document.getElementById('comment-tab');
+                if (tab) tab.classList.remove('mobile-expanded');
+                isCommentTabExpanded = false;
+            }
+        };
+
+        window.openFriendLinksPopup = () => {
+            openPopup('friend-container');
+            if (typeof window.showFriendLinks === 'function') window.showFriendLinks();
+            else {
+                 const friendLinksDiv = document.getElementById('friend-links-list');
+                 if (friendLinksDiv) friendLinksDiv.innerHTML = '<div style="text-align:center; padding:20px;">加载中...</div>';
+            }
+        };
+
+        window.closeFriendLinksPopup = (isEscKey = false) => {
+            closePopup('friend-container', isEscKey);
+            if (window.innerWidth <= 768) {
+                const tab = document.getElementById('friend-links-tab');
+                if (tab) tab.classList.remove('mobile-expanded');
+                isFriendLinksTabExpanded = false;
+            }
+        };
+
+        window.fixCommentLayout = () => {
+            const commentsContainer = document.getElementById('comments');
+            if (commentsContainer) commentsContainer.style.minHeight = '300px';
+        };
+
+        // --- Friend Link Management ---
+        window.showFriendLinks = async function() {
+            const container = document.getElementById('friend-links-list');
+            if (!container) {
+                 return;
+            }
+
+            container.innerHTML = '<div style="text-align:center; padding:20px;">加载中...</div>';
+            try {
+                let links = [];
+                let loaded = false;
+
+                for (const sourceUrl of getFriendLinksJsonUrls()) {
+                    try {
+                        const response = await retryAsync(() => fetch(sourceUrl, { cache: 'no-store' }), 1, 400);
+                        if (!response.ok) continue;
+                        const data = await response.json();
+                        const rawLinks = Array.isArray(data) ? data : (Array.isArray(data.links) ? data.links : []);
+                        links = rawLinks
+                            .map(item => ({
+                                name: (item && (item.name || item.title || '') || '').trim(),
+                                url: (item && (item.url || item.link || '') || '').trim(),
+                                description: (item && (item.description || item.desc || '') || '').trim(),
+                                icon: (item && (item.icon || item.avatar || '') || '').trim()
+                            }))
+                            .filter(item => item.name && item.url);
+                        loaded = true;
+                        break;
+                    } catch (_) {
+                        continue;
+                    }
+                }
+
+                if (!loaded) {
+                    throw new Error('未找到可用友链数据源');
+                }
+
+                container.innerHTML = '';
+
+                if (links.length === 0) {
+                    container.innerHTML = '<div class="no-links">暂无友链，欢迎申请！</div>';
+                    return;
+                }
+
+                links.forEach(link => {
+                    const name = link.name;
+                    const url = link.url;
+                    const description = link.description || '这个朋友很懒，还没写简介';
+                    const icon = link.icon || 'https://openlist.nn.ci/logo.svg';
+
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'friend-link-item';
+                    linkElement.innerHTML = `
+                        <img src="${icon}" alt="${name}" class="friend-link-icon" loading="lazy"
+                             onerror="this.onerror=null; this.src='https://api.ixiaowai.cn/api/api.php'; this.classList.add('fallback-icon');"
+                             onload="this.classList.add('loaded');" />
+                        <div class="friend-link-info">
+                            <div class="friend-link-name">${name}</div>
+                            <div class="friend-link-desc">${description}</div>
+                        </div>
+                    `;
+
+                    linkElement.onclick = () => window.open(url, '_blank');
+
+                    container.appendChild(linkElement);
+                });
+
+            } catch (error) {
+                console.error('加载友链失败', error);
+                container.innerHTML = `<div style="padding:20px; text-align:center; color:#f00;">加载友链失败：${error.message}</div><div style="padding:8px 20px; text-align:center; color:#999; font-size:12px;">可使用 /friends.json，或配置 GitHub 仓库后自动读取 friends.json。</div><div style="text-align:center;"><button type="button" style="padding:6px 12px; border:none; border-radius:6px; cursor:pointer;" onclick="window.configureGithubRepo()">配置 GitHub 仓库</button></div>`;
+            }
+        };
+
+        window.deleteFriendLink = async function() {
+            alert('当前为免部署模式，删除请在友链 JSON 源仓库中手动维护。');
+        };
+
+        // --- Friend Link Form Submission ---
+        const form = document.getElementById('friendLinkForm');
+        const toggleButton = document.getElementById('toggleFriendLinkForm');
+        const formContainer = document.getElementById('friendLinkFormContainer');
+
+        if (form && toggleButton && formContainer) {
+            const confirmCodeField = document.getElementById('confirmCode');
+            if (confirmCodeField) {
+                confirmCodeField.required = false;
+                confirmCodeField.removeAttribute('pattern');
+                confirmCodeField.removeAttribute('title');
+                confirmCodeField.placeholder = '可选：用于备注';
+            }
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const siteName = document.getElementById('siteName').value.trim();
+                const siteUrl = document.getElementById('siteUrl').value.trim();
+                const siteDesc = document.getElementById('siteDesc').value.trim();
+                const siteIcon = document.getElementById('siteIcon').value.trim() || 'https://openlist.nn.ci/logo.svg';
+                const confirmCode = document.getElementById('confirmCode').value.trim();
+
+                if (!siteName || !siteUrl || !siteDesc) { alert('请填写网站名称、链接和描述！'); return; }
+                const forbiddenWords = ['spam', 'hack', 'virus', 'script', 'alert', 'eval'];
+                if (forbiddenWords.some(word => (siteName + siteDesc + siteUrl).toLowerCase().includes(word))) {
+                    alert('内容包含不当词汇，请修改！'); return;
+                }
+
+                const lastSubmitTime = localStorage.getItem('lastFriendLinkSubmit');
+                const submitCount = parseInt(localStorage.getItem('friendLinkSubmitCount') || '0');
+                const submitDate = localStorage.getItem('friendLinkSubmitDate');
+                const today = new Date().toDateString();
+                const now = Date.now();
+
+                if (submitDate !== today) {
+                    localStorage.setItem('friendLinkSubmitCount', '0');
+                    localStorage.setItem('friendLinkSubmitDate', today);
+                }
+                if (lastSubmitTime && (now - parseInt(lastSubmitTime)) < SUBMIT_LIMITS.delay) { alert('提交过于频繁，请等待1分钟！'); return; }
+                if (submitCount >= SUBMIT_LIMITS.maxPerDay) { alert('今日提交次数已达上限！'); return; }
+
+                try { new URL(siteUrl); } catch { alert('请输入有效的网站链接！'); return; }
+                if (siteIcon) { try { new URL(siteIcon); } catch { alert('请输入有效的图标链接或留空！'); return; } }
+
+                try {
+                    const submitBtn = form.querySelector('.submit-button');
+                    submitBtn.textContent = '提交中...';
+                    submitBtn.disabled = true;
+
+                    const issueTitle = encodeURIComponent(`[友链申请] ${siteName}`);
+                    const issueBody = encodeURIComponent([
+                        '## 友链申请',
+                        '',
+                        `- 网站名称: ${siteName}`,
+                        `- 网站链接: ${siteUrl}`,
+                        `- 网站描述: ${siteDesc}`,
+                        `- 网站图标: ${siteIcon || '（未提供）'}`,
+                        `- 确认码: ${confirmCode || '（未提供）'}`
+                    ].join('\n'));
+
+                    const submitUrl = getFriendLinkSubmitUrl();
+                    if (submitUrl) {
+                        const separator = submitUrl.includes('?') ? '&' : '?';
+                        window.open(`${submitUrl}${separator}title=${issueTitle}&body=${issueBody}`, '_blank');
+                    } else {
+                        const text = decodeURIComponent(issueBody);
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(text);
+                        }
+                        alert('未配置友链提交链接，已复制申请内容。请将内容提交到你的 GitHub Issue。');
+                    }
+
+                    localStorage.setItem('lastFriendLinkSubmit', now.toString());
+                    localStorage.setItem('friendLinkSubmitCount', (submitCount + 1).toString());
+                    alert('申请信息已生成，请在打开页面完成提交。');
+                    form.reset();
+                } catch (error) {
+                    console.error('提交友链失败', error);
+                    alert(`提交失败: ${error.message}`);
+                } finally {
+                    const submitBtn = form.querySelector('.submit-button');
+                    submitBtn.textContent = '提交申请';
+                    submitBtn.disabled = false;
+                }
+            });
+
+            toggleButton.setAttribute('aria-expanded', 'false');
+            toggleButton.setAttribute('aria-controls', 'friendLinkFormContainer');
+            toggleButton.setAttribute('type', 'button');
+
+            toggleButton.addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                formContainer.classList.toggle('expanded');
+                const popupContent = toggleButton.closest('.popup-content');
+                if (formContainer.classList.contains('expanded')) {
+                    toggleButton.textContent = '点击收起友链申请表';
+                    popupContent.classList.remove('form-collapsed');
+                    popupContent.classList.add('form-expanded');
+                    setTimeout(() => {
+                        formContainer.querySelector('.form-collapsible-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 200);
+                } else {
+                    toggleButton.textContent = '点击填写友链申请表';
+                    popupContent.classList.remove('form-expanded');
+                    popupContent.classList.add('form-collapsed');
+                }
+            });
+
+            // Ensure form is collapsed by default
+            const popupContent = toggleButton.closest('.popup-content');
+            if (popupContent) popupContent.classList.add('form-collapsed');
+
+            // Prevent clicks inside form from closing the popup
+            form.addEventListener('click', e => e.stopPropagation());
+            form.querySelectorAll('input, textarea, select').forEach(el => {
+                el.addEventListener('click', e => e.stopPropagation());
+                el.addEventListener('focus', e => e.stopPropagation());
+            });
+        } else {
+            console.error("Friend link form elements not found.");
+        }
+
+        // --- Comment and Friend Links Initialization ---
+        function initializeCommentAndFriendFeatures() {
+            const isGiscusConfigured = () => Boolean(GISCUS_CONFIG.repo && GISCUS_CONFIG.repoId && GISCUS_CONFIG.categoryId);
+
+            window.loadCommentSystem = async () => {
+                const commentsDiv = document.getElementById('comments');
+                if (!commentsDiv) return;
+
+                commentsDiv.innerHTML = '<div style="text-align:center; padding:20px;">正在加载评论系统...</div>';
+
+                try {
+                    commentsDiv.innerHTML = '';
+
+                    if (isGiscusConfigured()) {
+                        await ensureGiscusReady();
+                        const script = document.createElement('script');
+                        script.src = 'https://giscus.app/client.js';
+                        script.async = true;
+                        script.crossOrigin = 'anonymous';
+                        script.setAttribute('data-repo', GISCUS_CONFIG.repo);
+                        script.setAttribute('data-repo-id', GISCUS_CONFIG.repoId);
+                        script.setAttribute('data-category', GISCUS_CONFIG.category);
+                        script.setAttribute('data-category-id', GISCUS_CONFIG.categoryId);
+                        script.setAttribute('data-mapping', GISCUS_CONFIG.mapping);
+                        script.setAttribute('data-strict', GISCUS_CONFIG.strict);
+                        script.setAttribute('data-reactions-enabled', GISCUS_CONFIG.reactionsEnabled);
+                        script.setAttribute('data-emit-metadata', GISCUS_CONFIG.emitMetadata);
+                        script.setAttribute('data-input-position', GISCUS_CONFIG.inputPosition);
+                        script.setAttribute('data-theme', GISCUS_CONFIG.theme);
+                        script.setAttribute('data-lang', GISCUS_CONFIG.lang);
+                        commentsDiv.appendChild(script);
+                    } else if (getGithubRepoPath()) {
+                        const script = document.createElement('script');
+                        script.src = 'https://utteranc.es/client.js';
+                        script.async = true;
+                        script.crossOrigin = 'anonymous';
+                        script.setAttribute('repo', getGithubRepoPath());
+                        script.setAttribute('issue-term', 'pathname');
+                        script.setAttribute('theme', 'github-light');
+                        script.setAttribute('label', 'comment');
+                        commentsDiv.appendChild(script);
+                    } else {
+                        commentsDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f00;">评论系统未配置 GitHub 仓库。</div><div style="text-align:center;"><button type="button" style="padding:6px 12px; border:none; border-radius:6px; cursor:pointer;" onclick="window.configureGithubRepo()">配置 GitHub 仓库</button></div>';
+                        return;
+                    }
+
+                    setTimeout(window.fixCommentLayout, 500);
+                } catch (error) {
+                    console.error('评论系统初始化失败:', error);
+                    commentsDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f00;">评论系统加载失败，请检查 GitHub 仓库可见性后重试。</div><div style="text-align:center;"><button type="button" style="padding:6px 12px; border:none; border-radius:6px; cursor:pointer;" onclick="window.loadCommentSystem()">重试加载</button></div>';
+                }
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const customizeRoot = document.getElementById('customize');
+            if (customizeRoot) {
+                customizeRoot.style.display = 'block';
+            }
+
+            ensureBusuanziStats();
+
+            initializeCommentAndFriendFeatures();
+            initSideTabHoverEffects();
+            const commentTab = document.getElementById('comment-tab');
+            const friendLinksTab = document.getElementById('friend-links-tab');
+            if (commentTab) {
+                commentTab.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    window.toggleCommentTab();
+                });
+            }
+            if (friendLinksTab) {
+                friendLinksTab.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    window.toggleFriendLinksTab();
+                });
+            }
+            let resizeTimer;
+            window.addEventListener('resize', debounce(() => {
+                handlePopupResize(); resetMobileTabStates(); initSideTabHoverEffects();
+            }, 150));
+
+            document.addEventListener('click', function(event) {
+                const clickedElement = event.target;
+                const isPopupRelated = clickedElement.closest('.popup-container') || clickedElement.closest('.popup-area') || clickedElement.closest('.side-tab') || clickedElement.closest('#comments') || clickedElement.closest('#friend-links-list') || clickedElement.closest('.friend-link-form-container');
+                if (!isPopupRelated) {
+                    const isMainContent = clickedElement.closest('.obj-box') || clickedElement.closest('.hope-stack') || clickedElement.closest('table');
+                    if (isMainContent) {
+                        if (window.innerWidth > 768) {
+                            if (document.querySelector('#comment-container.active')) window.closeCommentPopup(true);
+                            if (document.querySelector('#friend-container.active')) window.closeFriendLinksPopup(true);
+                        }
+                    }
+                }
+            });
+
+            // Touch event listeners for mobile swipe gestures
+            let touchStartX = 0, touchStartY = 0;
+            document.addEventListener('touchstart', function(event) { touchStartX = event.touches[0].clientX; touchStartY = event.touches[0].clientY; });
+            document.addEventListener('touchend', function(event) {
+                if (window.innerWidth > 768) return;
+                const touchEndX = event.changedTouches[0].clientX; const touchEndY = event.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX; const deltaY = touchEndY - touchStartY;
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    if (deltaX > 0 && document.querySelector('#comment-container.active')) window.closeCommentPopup(true);
+                    else if (deltaX < 0 && document.querySelector('#friend-container.active')) window.closeFriendLinksPopup(true);
+                }
+            });
+
+            // Attach close button listeners via delegation
+            document.getElementById('customize').addEventListener('click', function (event) {
+                if (event.target.classList.contains('close-button')) {
+                    const popupArea = event.target.closest('.popup-area');
+                    if (popupArea) {
+                        const container = popupArea.parentElement;
+                        if (container) {
+                            if (container.id === 'comment-container') window.closeCommentPopup(true);
+                            else if (container.id === 'friend-container') window.closeFriendLinksPopup(true);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- ==================== 延迟加载配套使用JS结束 ==================== -->
+<!-- ==================== 内部文件结束 ==================== -->

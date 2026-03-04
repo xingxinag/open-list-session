@@ -1,0 +1,1299 @@
+<!-- ==================== OpenList 头部文件开始 (完全重构版) ==================== -->
+
+<!-- OpenList 兼容性脚本 -->
+<script>
+if (!String.prototype.replaceAll) {
+    String.prototype.replaceAll = function(search, replacement) {
+        return this.split(search).join(replacement);
+    };
+}
+</script>
+
+<!-- 字体引入 -->
+<link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-webfont@1.1.0/lxgwwenkai-regular.css" />
+
+<!-- 访问统计 -->
+<script async src="https://busuanzi.icodeq.com/busuanzi.pure.mini.js" onerror="this.onerror=null;this.src='https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';"></script>
+
+<!-- 图标库 -->
+<link rel="stylesheet" href="https://npm.elemecdn.com/font6pro@6.0.1/css/fontawesome.min.css" media='all'>
+<link rel="stylesheet" href="https://npm.elemecdn.com/font6pro@6.0.1/css/all.min.css">
+
+<!-- LeanCloud / Valine 已迁移为 Giscus + GitHub JSON -->
+
+<!-- 音乐播放器 -->
+<link rel="stylesheet" href="https://npm.elemecdn.com/aplayer@1.10.1/dist/APlayer.min.css">
+<script src="https://npm.elemecdn.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://npm.elemecdn.com/meting@2.0.1/dist/Meting.min.js"></script>
+
+<!-- ==================== OpenList 专用样式开始 ==================== -->
+<style>
+    /* 移除通知栏关闭按钮 */
+    .notify-render .hope-close-button {
+        display: none;
+    }
+
+    /* ============= OpenList 背景图设置 ============= */
+    /* 白天模式背景 */
+    .hope-ui-light {
+        background-image: url("https://api.imlcd.cn/bg/mc.php?return=img") !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    /* 夜间模式背景 */
+    .hope-ui-dark {
+        background-image: url("https://imgapi.cn/api.php?zd=zsy&fl=dongman&gs=images") !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    /* 备用背景图API (注释保留) */
+    /*
+    备用API 1:
+    .hope-ui-light { background-image: url("https://api.vvhan.com/api/view?type=json") !important; }
+    .hope-ui-dark { background-image: url("https://api.btstu.cn/sjbz/api.php?lx=dongman") !important; }
+
+    备用API 2:
+    .hope-ui-light { background-image: url("https://picsum.photos/1920/1080?random=1") !important; }
+    .hope-ui-dark { background-image: url("https://source.unsplash.com/1920x1080/?night,dark") !important; }
+
+    备用API 3:
+    .hope-ui-light { background-image: url("https://api.dujin.org/bing/1920.php") !important; }
+    .hope-ui-dark { background-image: url("https://api.ghser.com/random/api.php") !important; }
+    */
+
+    /* ============= OpenList 透明度和毛玻璃效果 ============= */
+    /* 主列表容器 - 夜间模式 */
+    .obj-box.hope-stack.hope-c-dhzjXW.hope-c-PJLV.hope-c-PJLV-iigjoxS-css {
+        background-color: rgba(0, 0, 0, 0.15) !important;
+        backdrop-filter: blur(3px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* README 容器 - 夜间模式 */
+    .hope-c-PJLV.hope-c-PJLV-iiuDLME-css {
+        background-color: rgba(0, 0, 0, 0.85) !important;
+        backdrop-filter: blur(6px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* 主列表容器 - 白天模式 */
+    .obj-box.hope-stack.hope-c-dhzjXW.hope-c-PJLV.hope-c-PJLV-igScBhH-css {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(3px) saturate(150%);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* README 容器 - 白天模式 */
+    .hope-c-PJLV.hope-c-PJLV-ikSuVsl-css {
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(6px) saturate(150%);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* 顶部切换按钮 */
+    .hope-c-ivMHWx-hZistB-cv.hope-icon-button {
+        background-color: rgba(255, 255, 255, 0.4) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 侧边栏按钮 */
+    .hope-c-PJLV-ijgzmFG-css {
+        background-color: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 代码块样式 */
+    .hope-ui-light pre {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .hope-ui-dark pre {
+        background-color: rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* ============= 布局和通用设置 ============= */
+    /* 确保整个页面高度和相对定位 */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* 主要内容区域 */
+    .App {
+        min-height: 100vh;
+        position: relative;
+        padding-bottom: 120px; /* 减少为底部留出的空间 */
+    }
+
+    /* 底部区域 - 固定在页面底部并居中 */
+    .dibu {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background-color: transparent;
+        z-index: 900;
+        padding: 8px 0; /* 减少内边距 */
+        margin: 0;
+        text-align: center;
+    }
+
+    /* 底部文字阴影效果，增强可读性 */
+    .dibu * {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 深色模式下的底部样式 */
+    .hope-ui-dark .dibu {
+        background-color: transparent;
+    }
+
+    /* 深色模式下的文字阴影 */
+    .hope-ui-dark .dibu * {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .table {
+        margin: auto;
+    }
+
+    /* 隐藏默认底部 */
+    .footer {
+        display: none !important;
+    }
+
+    /* ============= OpenList 专用字体设置 ============= */
+    * {
+        font-family: "LXGW WenKai", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-weight: 500;
+    }
+
+    body {
+        font-family: "LXGW WenKai", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    /* ============= 自定义鼠标指针 ============= */
+    body {
+        cursor: url(https://cdn.jsdelivr.net/gh/sviptzk/HexoStaticFile@latest/Hexo/img/default.cur), default;
+    }
+
+    a:hover,
+    button:hover,
+    .clickable:hover {
+        cursor: url(https://cdn.jsdelivr.net/gh/sviptzk/HexoStaticFile@latest/Hexo/img/pointer.cur), pointer;
+    }
+
+    /* ============= 侧边贴靠按钮设计 ============= */
+    .side-tab {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 120px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        cursor: pointer;
+        z-index: 997;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        user-select: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 评论标签 - 左侧 */
+    .comment-tab {
+        left: -45px;
+        border-radius: 0 12px 12px 0;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    /* 友链标签 - 右侧 */
+    .friend-links-tab {
+        right: -45px;
+        border-radius: 12px 0 0 12px;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    /* PC端鼠标悬停效果 - 自动伸出 */
+    @media (min-width: 769px) {
+        .comment-tab:hover,
+        .side-tab.comment-hover {
+            left: 0;
+            box-shadow: 0 8px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .friend-links-tab:hover,
+        .side-tab.friend-hover {
+            right: 0;
+            box-shadow: 0 8px 30px rgba(250, 112, 154, 0.4);
+        }
+
+        /* 悬停区域扩展 - 鼠标贴近时触发 */
+        .comment-tab::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 0;
+            width: 20px;
+            height: 100%;
+            background: transparent;
+        }
+
+        .friend-links-tab::before {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 0;
+            width: 20px;
+            height: 100%;
+            background: transparent;
+        }
+    }
+
+    /* 移动端优化 */
+    @media (max-width: 768px) {
+        .side-tab {
+            width: 50px;
+            height: 100px;
+            font-size: 11px;
+        }
+
+        .comment-tab {
+            left: -35px;
+        }
+
+        .friend-links-tab {
+            right: -35px;
+        }
+
+        /* 移动端点击展开效果 */
+        .comment-tab.mobile-expanded {
+            left: 0;
+        }
+
+        .friend-links-tab.mobile-expanded {
+            right: 0;
+        }
+    }
+
+
+    /* ============= 弹窗容器设计 ============= */
+    .popup-container {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 998;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .popup-container.active {
+        opacity: 1;
+    }
+
+    /* ============= 弹窗区域设计 ============= */
+    .popup-area {
+        position: fixed;
+        width: min(560px, 85vw);
+        height: min(780px, 85vh);
+        max-width: 650px;
+        max-height: calc(100vh - 60px);
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* PC桌面端特殊优化 */
+    @media (min-width: 1200px) {
+        .popup-area {
+            width: min(640px, 45vw);
+            height: min(820px, 88vh);
+            max-width: 720px;
+        }
+    }
+
+    /* 超大屏幕优化 */
+    @media (min-width: 1600px) {
+        .popup-area {
+            width: min(680px, 40vw);
+            height: min(860px, 88vh);
+            max-width: 760px;
+        }
+    }
+
+    .hope-ui-dark .popup-area {
+        background: rgba(30, 30, 30, 0.95);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 评论区弹窗位置 - 智能定位避免遮挡 */
+    .comment-area {
+        left: 20px;
+        top: 60px;
+        transform: none;
+        max-height: calc(100vh - 120px);
+    }
+
+    /* 友链区弹窗位置 - 智能定位避免遮挡 */
+    .friend-links-display {
+        right: 20px;
+        top: 60px;
+        transform: none;
+        max-height: calc(100vh - 120px);
+    }
+
+    /* 弹窗头部 */
+    .popup-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hope-ui-dark .popup-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .popup-header h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #999;
+        padding: 8px;
+        border-radius: 50%;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-button:hover {
+        color: #333;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .hope-ui-dark .close-button:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 弹窗内容区域 */
+    .popup-content {
+        flex: 1;
+        height: calc(100% - 70px);
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        /* 确保滚动行为正常 */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 关闭提示 */
+    .close-hint {
+        position: absolute;
+        top: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        opacity: 0.9;
+        z-index: 9999;
+        white-space: nowrap;
+        backdrop-filter: blur(10px);
+    }
+
+    /* 滚动条美化 */
+    .popup-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .popup-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .popup-content::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 3px;
+    }
+
+    .popup-content::-webkit-scrollbar-thumb:hover {
+        background: #7c9eff;
+    }
+
+    /* ============= 友链列表样式 ============= */
+    #friend-links-list {
+        margin-bottom: 20px;
+        overflow-y: auto;
+        padding-right: 8px;
+        max-height: 450px;
+        min-height: 250px;
+        flex-shrink: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 表单展开时，友链列表收缩 */
+    .popup-content.form-expanded #friend-links-list {
+        max-height: 120px;
+        min-height: 120px;
+        margin-bottom: 15px;
+    }
+
+    /* 表单收起时，友链列表占满 */
+    .popup-content.form-collapsed #friend-links-list {
+        flex: 1;
+        max-height: calc(100vh - 200px);
+        min-height: 400px;
+    }
+
+    #friend-links-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #friend-links-list::-webkit-scrollbar-thumb {
+        background: #fa709a;
+        border-radius: 3px;
+    }
+
+    .friend-link-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 14px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        position: relative;
+    }
+
+    .hope-ui-dark .friend-link-item {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .friend-link-item:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .friend-link-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        margin-right: 14px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: scale(0.9);
+        background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+    }
+
+    .friend-link-icon.loaded {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .friend-link-icon.fallback-icon {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-color: #667eea;
+    }
+
+    .friend-link-item:hover .friend-link-icon {
+        border-color: #667eea;
+    }
+
+    .friend-link-info {
+        flex: 1;
+        z-index: 1;
+    }
+
+    .friend-link-name {
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .hope-ui-dark .friend-link-name {
+        color: #7c9eff;
+    }
+
+    .friend-link-desc {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.5;
+        opacity: 0.8;
+    }
+
+    .hope-ui-dark .friend-link-desc {
+        color: #ccc;
+    }
+
+    /* ============= 表单样式 ============= */
+    .toggle-form-button {
+        width: 100%;
+        padding: 14px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 表单展开时的按钮样式 */
+    .popup-content.form-expanded .toggle-form-button {
+        background: #28a745;
+        box-shadow: 0 3px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .popup-content.form-expanded .toggle-form-button:hover {
+        background: #218838;
+    }
+
+    .toggle-form-button:hover {
+        background: #7c9eff;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .friend-link-form-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+    }
+
+    .friend-link-form-container.expanded {
+        max-height: 600px;
+        opacity: 1;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.1s;
+        overflow-y: auto;
+    }
+
+    /* 表单展开时占满剩余空间 */
+    .popup-content.form-expanded .friend-link-form-container.expanded {
+        flex: 1;
+        max-height: calc(100vh - 300px);
+        min-height: 500px;
+    }
+
+    /* 表单收起时隐藏 */
+    .popup-content.form-collapsed .friend-link-form-container {
+        display: none;
+    }
+
+    /* 弹窗内容区域的过渡效果 */
+    .popup-content {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 切换按钮的图标提示 */
+    .toggle-form-button::after {
+        content: '📝';
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .popup-content.form-expanded .toggle-form-button::after {
+        content: '📋';
+        transform: rotate(180deg);
+    }
+
+    /* 表单内容样式优化 */
+    .friend-link-form-container .form-collapsible-content {
+        padding: 20px 0;
+        transform: translateY(-10px);
+        transition: transform 0.3s ease 0.1s;
+    }
+
+    .friend-link-form-container.expanded .form-collapsible-content {
+        transform: translateY(0);
+    }
+
+    /* 表单滚动条样式 */
+    .friend-link-form-container.expanded::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .friend-link-form-container.expanded::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .friend-link-form-container.expanded::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 3px;
+    }
+
+    .friend-link-form-container.expanded::-webkit-scrollbar-thumb:hover {
+        background: #7c9eff;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .hope-ui-dark .form-group label {
+        color: #e0e0e0;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background: rgba(255, 255, 255, 0.9);
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .hope-ui-dark .form-group input,
+    .hope-ui-dark .form-group textarea {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #e0e0e0;
+    }
+
+    .hope-ui-dark .form-group input:focus,
+    .hope-ui-dark .form-group textarea:focus {
+        border-color: #7c9eff;
+        box-shadow: 0 0 0 3px rgba(124, 158, 255, 0.1);
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .hope-ui-dark .form-group label {
+        color: #fff;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background: rgba(255, 255, 255, 0.9);
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .hope-ui-dark .form-group input {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        margin-top: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .submit-button:hover {
+        background: linear-gradient(135deg, #7c9eff 0%, #8b7dd8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .submit-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* 魔法提示样式 */
+    .magic-hint {
+        background: #667eea;
+        color: white;
+        padding: 14px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    /* ============= 移动端适配 - 侧边栏模式 ============= */
+    @media (max-width: 768px) {
+        /* 评论区：从左侧滑入 */
+        .comment-area {
+            left: 0 !important;
+            top: 0 !important;
+            width: min(320px, 80vw) !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            border-radius: 0 16px 16px 0 !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        .comment-area.mobile-active {
+            transform: translateX(0) !important;
+        }
+
+        /* 友链区：从右侧滑入 */
+        .friend-links-display {
+            right: 0 !important;
+            top: 0 !important;
+            width: min(320px, 80vw) !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            border-radius: 16px 0 0 16px !important;
+            transform: translateX(100%) !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        .friend-links-display.mobile-active {
+            transform: translateX(0) !important;
+        }
+
+        /* 移动端弹窗容器背景透明度调整 */
+        .popup-container {
+            background: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* 移动端滑动提示 */
+        .mobile-swipe-hint {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1001;
+            animation: fadeInOut 3s ease-in-out;
+            pointer-events: none;
+        }
+
+        .comment-area .mobile-swipe-hint {
+            right: -100px;
+        }
+
+        .friend-links-display .mobile-swipe-hint {
+            left: -100px;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+
+        .float-button {
+            padding: 12px 16px;
+            font-size: 13px;
+        }
+
+        .comment-button {
+            left: 15px;
+            bottom: 140px;
+        }
+
+        .friend-links-button {
+            right: 15px;
+            bottom: 140px;
+        }
+
+
+        .popup-header {
+            padding: 20px;
+        }
+
+        .popup-content {
+            padding: 20px;
+        }
+
+        .friend-link-item {
+            padding: 14px;
+        }
+
+        .friend-link-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+            border-width: 3px;
+        }
+
+    }
+
+    /* 小屏幕设备优化 */
+    @media (max-width: 480px) {
+        .friend-link-icon {
+            width: 52px;
+            height: 52px;
+            margin-right: 10px;
+        }
+    }
+
+    /* 高分辨率屏幕优化 */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .friend-link-icon {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+    }
+
+    /* ============= 多端设备优化 ============= */
+    /* 触摸设备优化 */
+    @media (hover: none) and (pointer: coarse) {
+        .friend-link-item {
+            padding: 16px;
+            min-height: 70px;
+        }
+
+        .delete-button {
+            opacity: 1;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+        }
+
+        .popup-area {
+            touch-action: pan-y;
+        }
+    }
+
+    /* 平板竖屏适配 */
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+        .friend-links-display,
+        .comment-area {
+            width: min(420px, 85vw);
+            height: min(650px, 80vh);
+        }
+
+        .friend-link-icon {
+            width: 46px;
+            height: 46px;
+        }
+    }
+
+    /* 横屏手机优化 */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .popup-area {
+            height: min(400px, 85vh);
+            top: 10px;
+        }
+
+        .popup-header {
+            padding: 15px;
+        }
+
+        .popup-content {
+            padding: 15px;
+        }
+    }
+
+    /* 大屏幕桌面优化 */
+    @media (min-width: 1440px) {
+        .friend-link-item {
+            padding: 16px;
+        }
+
+        .friend-link-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .friend-link-name {
+            font-size: 16px;
+        }
+
+        .friend-link-desc {
+            font-size: 14px;
+        }
+    }
+
+    /* 性能优化 */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* 移除GPU加速以避免潜在的性能问题 */
+
+    /* ============= 音乐播放器多端适配 ============= */
+    .aplayer.aplayer-fixed {
+        transition: all 0.3s ease !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        border: none !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* 深色模式下的播放器样式 */
+    .hope-ui-dark .aplayer.aplayer-fixed {
+        background: rgba(30, 30, 30, 0.95) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* ============= 音乐播放器列表控制 ============= */
+
+    /* 播放器主体 - 清理样式 */
+    .aplayer.aplayer-fixed .aplayer-body {
+        background: inherit !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* 播放器列表 - 交由 APlayer 的状态类控制显示/隐藏 */
+    .aplayer.aplayer-fixed .aplayer-list {
+        display: block !important;
+        position: absolute !important;
+        bottom: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+        z-index: 1000 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    /* APlayer 默认会加/去 aplayer-list-hide，保持其原生行为 */
+    .aplayer.aplayer-fixed .aplayer-list.aplayer-list-hide {
+        display: none !important;
+    }
+
+    /* 展开动画 */
+    .aplayer.aplayer-fixed .aplayer-list:not(.aplayer-list-hide) {
+        animation: fadeSlideIn 0.2s ease !important;
+    }
+    @keyframes fadeSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 列表内容容器 */
+    .aplayer.aplayer-fixed .aplayer-list ol {
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        backdrop-filter: blur(10px) !important;
+    }
+
+    /* 深色模式列表背景 */
+    .hope-ui-dark .aplayer.aplayer-fixed .aplayer-list ol {
+        background: rgba(30, 30, 30, 0.95) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* 列表项 */
+    .aplayer.aplayer-fixed .aplayer-list ol li {
+        border: none !important;
+        background: transparent !important;
+        padding: 10px 15px !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .aplayer.aplayer-fixed .aplayer-list ol li:last-child {
+        border-bottom: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+
+    .aplayer.aplayer-fixed .aplayer-list ol li:first-child {
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    .aplayer.aplayer-fixed .aplayer-list ol li:hover {
+        background: rgba(102, 126, 234, 0.1) !important;
+    }
+
+    /* 深色模式列表项 */
+    .hope-ui-dark .aplayer.aplayer-fixed .aplayer-list ol li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #e0e0e0 !important;
+    }
+
+    .hope-ui-dark .aplayer.aplayer-fixed .aplayer-list ol li:hover {
+        background: rgba(124, 158, 255, 0.1) !important;
+    }
+
+    /* 播放器按钮 */
+    .aplayer.aplayer-fixed .aplayer-icon-menu {
+        opacity: 1 !important;
+        cursor: pointer !important;
+    }
+
+    /* 清除可能的伪元素 */
+    .aplayer.aplayer-fixed::before,
+    .aplayer.aplayer-fixed::after,
+    .aplayer.aplayer-fixed .aplayer-list::before,
+    .aplayer.aplayer-fixed .aplayer-list::after {
+        display: none !important;
+    }
+
+    /* 小屏幕播放器优化 */
+    @media (max-width: 480px) {
+        .aplayer.aplayer-fixed {
+            bottom: 130px !important; /* 调整到底栏上方 */
+            right: 10px !important;
+            width: calc(100% - 20px) !important;
+            max-width: 300px !important;
+        }
+
+        .aplayer.aplayer-fixed .aplayer-body {
+            height: 50px !important;
+        }
+
+        .aplayer.aplayer-fixed .aplayer-pic {
+            width: 50px !important;
+            height: 50px !important;
+        }
+    }
+
+    /* 中等屏幕播放器优化 */
+    @media (min-width: 481px) and (max-width: 768px) {
+        .aplayer.aplayer-fixed {
+            bottom: 130px !important; /* 调整到底栏上方 */
+            right: 15px !important;
+            width: 320px !important;
+        }
+    }
+
+    /* 平板和小桌面 */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .aplayer.aplayer-fixed {
+            bottom: 130px !important; /* 调整到底栏上方 */
+            right: 20px !important;
+            width: 340px !important;
+        }
+    }
+
+    /* 大屏桌面 */
+    @media (min-width: 1025px) {
+        .aplayer.aplayer-fixed {
+            bottom: 130px !important; /* 调整到底栏上方 */
+            right: 30px !important;
+            width: 360px !important;
+        }
+    }
+
+    /* 横屏模式播放器调整 */
+    @media (orientation: landscape) and (max-height: 500px) {
+        .aplayer.aplayer-fixed {
+            bottom: 130px !important; /* 保持在底栏上方 */
+            height: 60px !important;
+        }
+    }
+
+    /* 避免布局抖动 */
+    .popup-container {
+        contain: layout style paint;
+    }
+
+    /* ============= 删除功能样式 ============= */
+    .friend-link-item .delete-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255, 59, 48, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .friend-link-item:hover .delete-button {
+        opacity: 1;
+    }
+
+    .friend-link-item .delete-button:hover {
+        background: rgba(255, 59, 48, 1);
+        transform: scale(1.1);
+    }
+
+    .delete-confirm {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 0 0 16px 16px;
+        padding: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 3;
+    }
+
+    .friend-link-item.deleting .delete-confirm {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .hope-ui-dark .delete-confirm {
+        background: rgba(30, 30, 30, 0.98);
+        color: #fff;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .confirm-button,
+    .cancel-button {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .confirm-button {
+        background: #ff9a9e;
+        color: white;
+    }
+
+    .cancel-button {
+        background: rgba(0, 0, 0, 0.1);
+        color: #666;
+    }
+
+    .confirm-button:hover {
+        background: #ffb4b8;
+    }
+
+    .cancel-button:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #333;
+    }
+</style>
